@@ -1,0 +1,86 @@
+﻿@page "/StudentsList"
+@inject IStudentRepository Repository
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+
+
+<PageTitle>
+    List of Students
+</PageTitle>
+
+<div class=" row justify-content-center">
+    <div class=" col-6">
+        <a href="/Add-Student" class="col-12 btn btn-primary btn-sm btn-block">Create New Student</a>
+        @if (students is null)
+        {
+            <div class="student-data">
+                Data is loadiing...
+            </div>
+        }
+        else if (students.Any())
+        {
+            var i = 1;
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">Weight</th>
+                        <th scope="col">Graduated</th>
+                        <th scope="col">View</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stud in students)
+                    {
+                        <tr>
+                            <th scope="row">@i</th>
+                            <td> @stud.Name</td>
+                            <td>@stud.DataOfBirth?.ToString("MM/dd/yyyy")</td>
+                            <td>@stud.Weight</td>
+                            <td>@stud.Graduated</td>
+                            <td><a href="@($"/ViewStudent/{@stud.Id}")" class="col-12 btn btn-primary btn-sm btn-block">View</a></td>
+                            <td><a href="@($"/EditStudent/{@stud.Id}")" class="col-12 btn btn-primary btn-sm btn-block">Edit</a></td>
+                            <td> <button type="button" class="col-12 btn btn-primary btn-sm btn-block" @onclick="@(async () => await DeleteStudent(@stud.Id))"> Delete </button> </td>
+
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="student-data">
+                Data is loadiing...
+            </div>
+        }
+  
+    </div>
+</div>
+
+@code {
+    private int tempId = 0;
+    private List<Students>? students;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await Repository.GetAllStudentsAsync();
+    }
+
+    public async Task DeleteStudent(int id)
+    {
+        await Repository.DeleteStudentByIdAsync(id);
+        Navigation.NavigateTo("/StudentsList");
+        await this.OnInitializedAsync();
+    }
+    
+   
+}
+

@@ -1,0 +1,80 @@
+﻿@page "/EditStudent/{id:int}"
+@inject IStudentRepository repository
+@inject NavigationManager Navigation
+
+
+<PageTitle>
+    Edit Student Info
+</PageTitle>
+
+@if(student is not null)
+{
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <EditForm method="post" Enhance="true" FormName="EditStudentForm" OnValidSubmit="EditStudentInfo" Model="student" autocomplete="off">
+                <h3>
+                    Edit Student @Id
+                </h3>
+                <input type="hidden" name="student.Id" value="@student.Id" />
+                <div class="mb-3">
+                    <label for="Name" class="form-label">
+                        Name
+                    </label>
+                    <InputText id="Name" @bind-Value="student.Name" class="form-control shadow-none"></InputText>
+                </div>
+                <div class="mb-3">
+                    <label for="DOB" class="form-label">
+                        DOD
+                    </label>
+                    <InputDate id="DOB" @bind-Value="student.DataOfBirth" class="form-control shadow-none"></InputDate>
+                </div>
+                <div class="mb-3">
+                    <label for="Weight" class="form-label">
+                        Weight
+                    </label>
+                    <InputNumber id="Weight" @bind-Value="student.Weight" class="form-control shadow-none"></InputNumber>
+                </div>
+                <div class="mb-3">
+                    <label for="Graduated" class="form-label">
+                        Graduated
+                    </label>
+
+                    <InputCheckbox id="Graduated" @bind-Value="student.Graduated"></InputCheckbox>
+
+                    
+
+                </div>
+                <div class="mb-3">
+                    <button class="col-12 btn btn-primary btn-sm btn-block">Submit</button>
+                </div>
+                <a href="/StudentsList" class="col-12 btn btn-primary btn-sm btn-block">View Students</a>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            </EditForm>
+        </div>
+
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Students? student{ get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        student ??= await repository.GetStudentByIdAsync(Id);
+    }
+
+    private async Task EditStudentInfo()
+    {
+        if(student is not null)
+        {
+            await repository.UpdateStudent(student);
+            Navigation.NavigateTo("/StudentsList");
+        }
+    }
+}

@@ -1,10 +1,21 @@
+using BlazorCRUDApp.Application.Interfaces;
 using BlazorCRUDApp.Components;
+using BlazorCRUDApp.Infrastructure.Context;
+using BlazorCRUDApp.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+//added for DB Context
+builder.Services.AddDbContextFactory<BlazorCRUDAPPDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BlazerCRUDApp"));
+});
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 var app = builder.Build();
 

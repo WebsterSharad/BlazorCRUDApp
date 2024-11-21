@@ -1,0 +1,67 @@
+﻿@page "/ViewStudent/{id:int}"
+@inject IStudentRepository repository
+@inject NavigationManager Navigation
+
+<PageTitle>
+    View Student Info
+</PageTitle>
+
+@if (student is not null)
+{
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <EditForm method="post" Enhance="true" FormName="ViewStudentForm" Model="student" autocomplete="off">
+                <h3>
+                    View Student @Id
+                </h3>
+                <input type="hidden" name="student.Id" value="@student.Id" />
+                <div class="mb-3">
+                    <label for="Name" class="form-label">
+                        Name : 
+                    </label>
+                    @student.Name
+                    
+                </div>
+                <div class="mb-3">
+                    <label for="DOB" class="form-label">
+                        DOB  :
+                    </label>
+                    @student.DataOfBirth
+                    
+                </div>
+                <div class="mb-3">
+                    <label for="Weight" class="form-label">
+                        Weight   :
+                    </label>
+                    @student.Weight
+                </div>
+                <div class="mb-3">
+                    <label for="Graduated" class="form-label">
+                        Graduated  :
+                    </label>
+                    @student.Graduated
+                </div>
+               
+                <a href="/StudentsList" class="col-12 btn btn-primary btn-sm btn-block">View Students</a>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            </EditForm>
+        </div>
+
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Students? student { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        student ??= await repository.GetStudentByIdAsync(Id);
+    }
+}
